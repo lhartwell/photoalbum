@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\Auth;
 
 class PhotosController extends Controller
 {
-	
+
 	  public static $thumb_folder='/photos/thumbs/';
 		public static $bigger_folder='/photos/bigger/';
 		public static $fullsize_folder='/photos/fullsize/';
-		public static $video_folder='/photos/videos/';		
+		public static $video_folder='/photos/videos/';
 		private $max_thumb_width=200;
 		private $max_thumb_height=200;
 		private $max_bigger_width=700;
 		private $max_bigger_height=700;
 
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -28,6 +28,17 @@ class PhotosController extends Controller
      */
     public function index($id)
     {
+        $folders=array(
+            public_path().'/photos/thumbs/',
+            public_path().'/photos/bigger/',
+            public_path().'/photos/fullsize/',
+            public_path().'/photos/videos/'
+        );
+        foreach($folders as $folder) {
+            if(!\File::exists($folder)) {
+                File::makeDirectory($folder, $mode = 0777, true, true);
+            }
+        }
     		$photos=array();
         if($id>0) {
         	$brute_photos = Photos::where('album_id',$id)->paginate(20);
@@ -43,12 +54,12 @@ class PhotosController extends Controller
 	    				$photos[$photo->id]['fullsize']=self::$fullsize_folder.$photo->filename;
 	    			}
 	    		}
-	    	
+
         }
         $album_name = AlbumsController::getAlbumName($id);
         $album['name']=$album_name;
         $album['id']=$id;
-				$add_thumbnail=self::getAddImage();        
+				$add_thumbnail=self::getAddImage();
         return view('photos',compact('brute_photos','photos','album','add_thumbnail'));
     }
 
@@ -90,8 +101,8 @@ class PhotosController extends Controller
         $img = Image::make($image->path());
         $img->resize($this->max_bigger_width, $this->max_bigger_height, function ($constraint) {
             $constraint->aspectRatio();
-        })->save($destinationPath.$imageName);        
-      	
+        })->save($destinationPath.$imageName);
+
         	$image->move(public_path().self::$fullsize_folder,$imageName);
    			} else {
    				$image->move(public_path().self::$video_folder,$imageName);
@@ -106,8 +117,8 @@ class PhotosController extends Controller
    				$photo->video=0;
    			}
    			$photo->save();
-   			
-        return response()->json(['success'=>$imageName]);		 
+
+        return response()->json(['success'=>$imageName]);
     }
 
     /**
@@ -154,7 +165,7 @@ class PhotosController extends Controller
     {
         //
     }
-	
+
     public static function getNoImage() {
     	return (url('/').self::$thumb_folder.'no-image.svg');
     }
@@ -162,7 +173,7 @@ class PhotosController extends Controller
     public static function getAddImage() {
     	return (url('/').self::$thumb_folder.'plus-icon.jpg');
     }
-    
+
     public static function getThumbnailLink($image_id) {
     	$photo=Photo::find($image_id);
     	if(isset($photo->id) || $photo->id<1) {
@@ -171,7 +182,7 @@ class PhotosController extends Controller
     		return (url('/').self::$thumb_folder.$image->name);
     	}
     }
-    
+
     public function gallery($id) {
     		$photos=array();
         if($id>0) {
@@ -185,7 +196,7 @@ class PhotosController extends Controller
         $album_name = AlbumsController::getAlbumName($id);
         $album['name']=$album_name;
         $album['id']=$id;
-				$add_thumbnail=self::getAddImage();        
-        return view('photos-gallery',compact('brute_photos','photos','album','add_thumbnail'));    	
+				$add_thumbnail=self::getAddImage();
+        return view('photos-gallery',compact('brute_photos','photos','album','add_thumbnail'));
     }
 }
