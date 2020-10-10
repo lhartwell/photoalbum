@@ -36,7 +36,7 @@ class PhotosController extends Controller
         );
         foreach($folders as $folder) {
             if(!\File::exists($folder)) {
-                File::makeDirectory($folder, $mode = 0777, true, true);
+                \File::makeDirectory($folder, $mode = 0777, true, true);
             }
         }
     		$photos=array();
