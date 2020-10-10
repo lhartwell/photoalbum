@@ -7,9 +7,9 @@
 
 @section('content')
 <div class="container">
-       
+
     <h3 class="jumbotron">Add Photos to {{$album['name']}}</h3>
-           @if (count($errors) > 0)
+            @if (count($errors) > 0)
                 <div class="alert alert-danger">
                     <strong>Whoops!</strong> There were some problems with your input.<br><br>
                     <ul>
@@ -28,7 +28,7 @@
   	<a href="{{ route('photos.list',['id'=>$album['id']]) }}" class="btn btn-primary">Back to album</a>
   </div>
 </div>
-  
+
 @endsection
 
 @section('footer_scripts')
@@ -39,7 +39,7 @@
             beforeSend: function(request) {
                 return request.setRequestHeader('X-CSRF-Token', csrf);
             }
-        });    	
+        });
         Dropzone.options.dropzone =
         {
             maxFilesize: 10,
